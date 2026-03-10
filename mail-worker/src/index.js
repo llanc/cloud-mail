@@ -48,7 +48,8 @@ export default {
 			const contentType = response.headers.get('content-type') || '';
 			if (contentType.includes('text/html')) {
 				const html = await response.text();
-				return new Response(html.replace('<title>Cloud Mail</title>', `<title>${title}</title>`), {
+				const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+				return new Response(html.replace('<title>Cloud Mail</title>', `<title>${safeTitle}</title>`), {
 					status: response.status,
 					headers: response.headers,
 				});
