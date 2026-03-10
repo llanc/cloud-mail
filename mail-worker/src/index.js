@@ -5,6 +5,7 @@ import verifyRecordService from './service/verify-record-service';
 import emailService from './service/email-service';
 import kvObjService from './service/kv-obj-service';
 import oauthService from "./service/oauth-service";
+import KvConst from './const/kv-const';
 export default {
 	 async fetch(req, env, ctx) {
 
@@ -19,6 +20,31 @@ export default {
 		 if (['/static/','/attachments/'].some(p => url.pathname.startsWith(p))) {
 			 return await kvObjService.toObjResp( { env }, url.pathname.substring(1));
 		 }
+
+		if (url.pathname === '/manifest.webmanifest') {
+			try {
+				const setting = await env.kv.get(KvConst.SETTING, { type: 'json' });
+				const title = setting?.title || 'Cloud Mail';
+				const manifest = {
+					name: title,
+					short_name: title,
+					background_color: '#FFFFFF',
+					theme_color: '#FFFFFF',
+					icons: [
+						{
+							src: 'mail-pwa.png',
+							sizes: '192x192',
+							type: 'image/png',
+						}
+					],
+				};
+				return new Response(JSON.stringify(manifest), {
+					headers: { 'Content-Type': 'application/manifest+json' },
+				});
+			} catch (e) {
+				return env.assets.fetch(req);
+			}
+		}
 
 		return env.assets.fetch(req);
 	},
