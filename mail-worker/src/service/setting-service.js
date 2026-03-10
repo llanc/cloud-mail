@@ -177,7 +177,7 @@ const settingService = {
 
 		return {
 			register: settingRow.register,
-			title: settingRow.title,
+			title: settingRow.title || c.env.TITLE || 'Cloud Mail',
 			manyEmail: settingRow.manyEmail,
 			addEmail: settingRow.addEmail,
 			autoRefresh: settingRow.autoRefresh,
