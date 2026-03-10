@@ -42,7 +42,24 @@ export default {
 			}
 		}
 
-		return env.assets.fetch(req);
+		const assetResponse = await env.assets.fetch(req);
+		const contentType = assetResponse.headers.get('content-type') || '';
+		if (contentType.includes('text/html')) {
+			try {
+				const setting = await env.kv.get(KvConst.SETTING, { type: 'json' });
+				const title = setting?.title || 'Cloud Mail';
+				const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+				let html = await assetResponse.text();
+				html = html.replace('<title>Cloud Mail</title>', `<title>${safeTitle}</title>`);
+				return new Response(html, {
+					status: assetResponse.status,
+					headers: assetResponse.headers,
+				});
+			} catch (e) {
+				return assetResponse;
+			}
+		}
+		return assetResponse;
 	},
 	email: email,
 	async scheduled(c, env, ctx) {
