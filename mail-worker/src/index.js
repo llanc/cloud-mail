@@ -30,7 +30,7 @@ export default {
 				if (!assetResponse.ok) {
 					return assetResponse;
 				}
-				const title = setting?.title || env.TITLE || 'Cloud Mail';
+				const title = setting?.title || 'Cloud Mail';
 				const manifest = await assetResponse.json();
 				manifest.name = title;
 				manifest.short_name = title;
@@ -40,21 +40,6 @@ export default {
 			} catch (e) {
 				return env.assets.fetch(req);
 			}
-		}
-
-		const title = env.TITLE;
-		if (title) {
-			const response = await env.assets.fetch(req);
-			const contentType = response.headers.get('content-type') || '';
-			if (contentType.includes('text/html')) {
-				const html = await response.text();
-				const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-				return new Response(html.replace('<title>Cloud Mail</title>', `<title>${safeTitle}</title>`), {
-					status: response.status,
-					headers: response.headers,
-				});
-			}
-			return response;
 		}
 
 		return env.assets.fetch(req);
