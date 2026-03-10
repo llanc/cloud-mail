@@ -27,12 +27,15 @@ export default {
 					env.kv.get(KvConst.SETTING, { type: 'json' }),
 					env.assets.fetch(req)
 				]);
+				if (!assetResponse.ok) {
+					return assetResponse;
+				}
 				const title = setting?.title || 'Cloud Mail';
 				const manifest = await assetResponse.json();
 				manifest.name = title;
 				manifest.short_name = title;
 				return new Response(JSON.stringify(manifest), {
-					headers: { 'Content-Type': 'application/manifest+json; charset=utf-8' },
+					headers: { 'Content-Type': 'application/manifest+json' },
 				});
 			} catch (e) {
 				return env.assets.fetch(req);
