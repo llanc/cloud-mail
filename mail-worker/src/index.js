@@ -23,23 +23,16 @@ export default {
 
 		if (url.pathname === '/manifest.webmanifest') {
 			try {
-				const setting = await env.kv.get(KvConst.SETTING, { type: 'json' });
+				const [setting, assetResponse] = await Promise.all([
+					env.kv.get(KvConst.SETTING, { type: 'json' }),
+					env.assets.fetch(req)
+				]);
 				const title = setting?.title || 'Cloud Mail';
-				const manifest = {
-					name: title,
-					short_name: title,
-					background_color: '#FFFFFF',
-					theme_color: '#FFFFFF',
-					icons: [
-						{
-							src: 'mail-pwa.png',
-							sizes: '192x192',
-							type: 'image/png',
-						}
-					],
-				};
+				const manifest = await assetResponse.json();
+				manifest.name = title;
+				manifest.short_name = title;
 				return new Response(JSON.stringify(manifest), {
-					headers: { 'Content-Type': 'application/manifest+json' },
+					headers: { 'Content-Type': 'application/manifest+json; charset=utf-8' },
 				});
 			} catch (e) {
 				return env.assets.fetch(req);
