@@ -45,9 +45,11 @@ export default {
 		const contentType = assetResponse.headers.get('content-type') || '';
 		if (contentType.includes('text/html')) {
 			try {
-				const setting = await env.kv.get(KvConst.SETTING, { type: 'json' });
+				const [setting, html] = await Promise.all([
+    					env.kv.get(KvConst.SETTING, { type: 'json' }),
+    					assetResponse.text()
+				]);
 				const title = setting?.title || 'Cloud Mail';
-				let html = await assetResponse.text();
 				html = html.replace('<title>Cloud Mail</title>', `<title>${title}</title>`);
 				return new Response(html, {
 					status: assetResponse.status,
@@ -57,7 +59,7 @@ export default {
 				return assetResponse;
 			}
 		}
-		return env.assets.fetch(req);
+		return assetResponse;
 	},
 	email: email,
 	async scheduled(c, env, ctx) {
