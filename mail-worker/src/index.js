@@ -50,8 +50,8 @@ export default {
     					assetResponse.text()
 				]);
 				const title = setting?.title || 'Cloud Mail';
-				html = html.replace('<title>Cloud Mail</title>', `<title>${title}</title>`);
-				return new Response(html, {
+				const titleHtml = html.replace('<title>Cloud Mail</title>', `<title>${title}</title>`);
+				return new Response(titleHtml, {
 					status: assetResponse.status,
 					headers: assetResponse.headers,
 				});
